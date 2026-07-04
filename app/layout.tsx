@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description: "Shop ACZ products.",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "ACZ",
   },
   formatDetection: {
@@ -56,7 +56,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#0f766e",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
