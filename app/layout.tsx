@@ -75,7 +75,7 @@ export default function RootLayout({
         <div className="flex h-dvh flex-col overflow-hidden">
           <Header />
 
-          <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <main className="min-h-0 flex-1">
             <div className="mx-auto w-full max-w-7xl pb-28">
               {children}
             </div>

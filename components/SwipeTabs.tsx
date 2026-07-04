@@ -61,30 +61,32 @@ export default function SwipeTabs({ products }: { products: ProductCard[] }) {
   return (
     <div className="mx-auto w-full max-w-4xl">
       {/* Synchronized menu */}
-      <div className="flex overflow-x-auto border-b border-gray-200">
-        {tabs.map((tab, index) => {
-          const isActive = activeIndex === index;
+      <div className="sticky top-0 z-20 bg-white">
+        <div className="flex overflow-x-auto border-b border-gray-200">
+            {tabs.map((tab, index) => {
+            const isActive = activeIndex === index;
 
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => handleMenuClick(index)}
-              className={[
-                "relative shrink-0 px-5 py-3 text-sm font-medium transition",
-                isActive
-                  ? "text-black"
-                  : "text-gray-500 hover:text-gray-800",
-              ].join(" ")}
-            >
-              {tab.label}
+            return (
+                <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleMenuClick(index)}
+                className={[
+                    "relative shrink-0 px-5 py-3 text-sm font-semibold transition",
+                    isActive
+                    ? "text-[var(--color-primary)]"
+                    : "text-gray-500 hover:text-gray-800",
+                ].join(" ")}
+                >
+                {tab.label}
 
-              {isActive && (
-                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-black" />
-              )}
-            </button>
-          );
-        })}
+                {isActive && (
+                    <span className="absolute inset-x-0 bottom-1 h-0.5 bg-[var(--color-primary)] w-1/2 mx-auto max-w-[24px]" />
+                )}
+                </button>
+            );
+            })}
+        </div>
       </div>
 
       {/* Swipeable content */}
@@ -101,7 +103,7 @@ export default function SwipeTabs({ products }: { products: ProductCard[] }) {
       >
         {tabs.map((tab) => (
           <SwiperSlide key={tab.id}>
-            <div className="min-h-0 p-2">
+            <div className="min-h-0 p-2 overflow-y-auto overscroll-contain">
                 <section className="columns-2 gap-4 md:grid-cols-4">
                     {products.map((product: ProductCard) => (
                     <a key={product.id} href={`/products/${product.handle}`} className="mb-4 block break-inside-avoid bg-gray-100 rounded-md hover:shadow-md transition-shadow shadow">
