@@ -1,8 +1,16 @@
-import { IMAGE_FRAGMENT } from '@/lib/fragments';
+import {
+  IMAGE_FRAGMENT,
+  MONEY_FRAGMENT,
+  PRODUCT_CARD_FRAGMENT,
+} from '@/lib/fragments';
 
 export const COLLECTIONS_QUERY = `#graphql
-  query Collections($first: Int = 24) {
-    collections(first: $first) {
+  query Collections(
+    $first: Int = 24, 
+    $productsFirst: Int = 12
+    $query: String = ""
+  ) {
+    collections(first: $first, query: $query) {
       nodes {
         id
         title
@@ -11,9 +19,16 @@ export const COLLECTIONS_QUERY = `#graphql
         image {
           ...ImageFragment
         }
+        products(first: $productsFirst) {
+          nodes {
+            ...ProductCardFragment
+          }
+        }
       }
     }
   }
 
   ${IMAGE_FRAGMENT}
+  ${MONEY_FRAGMENT}
+  ${PRODUCT_CARD_FRAGMENT}
 `;

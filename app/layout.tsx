@@ -76,7 +76,7 @@ export default function RootLayout({
           <Header />
 
           <main className="min-h-0 flex-1 overflow-hidden">
-            <div className="mx-auto h-full min-h-0 w-full max-w-7xl pb-28">
+            <div className="mx-auto h-full min-h-0 w-full max-w-7xl">
               {children}
             </div>
           </main>

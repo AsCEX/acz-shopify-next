@@ -1,50 +1,45 @@
 "use client";
-
-import type {ProductCard} from '@/lib/types';
+import type {CollectionsQuery, ProductCard} from '@/lib/types';
 import Image from 'next/image';
 
-import {useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {Swiper, SwiperSlide} from "swiper/react";
 import type {Swiper as SwiperInstance} from "swiper";
 
 import "swiper/css";
 
-const tabs = [
+type CollectionTab = CollectionsQuery["collections"]["nodes"][number];
+
+const fallbackTabs: CollectionTab[] = [
   {
     id: "overview",
-    label: "Overview",
-    content: (
-      <div>
-        <h2 className="text-2xl font-bold">Overview</h2>
-        <p className="mt-3 text-gray-600">
-          This is the overview content.
-        </p>
-      </div>
-    ),
+    title: "Overview",
+    handle: "overview",
+    description: "",
+    image: null,
+    products: {
+      nodes: [],
+    },
   },
   {
     id: "features",
-    label: "Features",
-    content: (
-      <div>
-        <h2 className="text-2xl font-bold">Features</h2>
-        <p className="mt-3 text-gray-600">
-          These are the available features.
-        </p>
-      </div>
-    ),
+    title: "Features",
+    handle: "features",
+    description: "",
+    image: null,
+    products: {
+      nodes: [],
+    },
   },
   {
     id: "reviews",
-    label: "Reviews",
-    content: (
-      <div>
-        <h2 className="text-2xl font-bold">Reviews</h2>
-        <p className="mt-3 text-gray-600">
-          This is the reviews section.
-        </p>
-      </div>
-    ),
+    title: "Reviews",
+    handle: "reviews",
+    description: "",
+    image: null,
+    products: {
+      nodes: [],
+    },
   },
 ];
 
@@ -57,11 +52,39 @@ function shouldShowComparePrice(productId: string) {
   return hash % 2 === 0;
 }
 
-export default function SwipeTabs({ products }: { products: ProductCard[] }) {
+export default function SwipeTabs({
+  collections,
+}: {
+  collections: CollectionTab[];
+}) {
   const swiperRef = useRef<SwiperInstance | null>(null);
+  const tabsNavRef = useRef<HTMLDivElement | null>(null);
+  const tabButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const tabs = useMemo(
+    () => (collections.length > 0 ? collections : fallbackTabs),
+    [collections],
+  );
+
+  useEffect(() => {
+    const activeButton = tabButtonRefs.current[activeIndex];
+    const tabsNav = tabsNavRef.current;
+
+    if (!activeButton || !tabsNav) {
+      return;
+    }
+
+    const buttonCenter = activeButton.offsetLeft + activeButton.offsetWidth / 2;
+    const navCenter = tabsNav.clientWidth / 2;
+
+    tabsNav.scrollTo({
+      left: buttonCenter - navCenter,
+      behavior: "smooth",
+    });
+  }, [activeIndex]);
 
   const handleMenuClick = (index: number) => {
+    setActiveIndex(index);
     swiperRef.current?.slideTo(index);
   };
 
@@ -69,29 +92,35 @@ export default function SwipeTabs({ products }: { products: ProductCard[] }) {
     <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-col">
       {/* Synchronized menu */}
       <div className="sticky top-0 z-20 bg-white">
-        <div className="flex overflow-x-auto border-b border-gray-200">
+        <div
+          ref={tabsNavRef}
+          className="flex overflow-x-auto border-b border-gray-200 scrollbar-none"
+        >
             {tabs.map((tab, index) => {
-            const isActive = activeIndex === index;
+                const isActive = activeIndex === index;
 
-            return (
-                <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleMenuClick(index)}
-                className={[
-                    "relative shrink-0 px-5 py-3 text-sm font-semibold transition",
-                    isActive
-                    ? "text-[var(--color-primary)]"
-                    : "text-gray-500 hover:text-gray-800",
-                ].join(" ")}
-                >
-                {tab.label}
+                return (
+                    <button
+                    key={tab.id}
+                    ref={(button) => {
+                      tabButtonRefs.current[index] = button;
+                    }}
+                    type="button"
+                    onClick={() => handleMenuClick(index)}
+                    className={[
+                        "relative shrink-0 px-5 py-3 text-sm font-semibold transition",
+                        isActive
+                        ? "text-[var(--color-primary)]"
+                        : "text-gray-500 hover:text-gray-800",
+                    ].join(" ")}
+                    >
+                    {tab.title}
 
-                {isActive && (
-                    <span className="absolute inset-x-0 bottom-1 h-0.5 bg-[var(--color-primary)] w-1/2 mx-auto max-w-[24px]" />
-                )}
-                </button>
-            );
+                    {isActive && (
+                        <span className="absolute inset-x-0 bottom-1 h-0.5 bg-[var(--color-primary)] w-1/2 mx-auto max-w-[24px]" />
+                    )}
+                    </button>
+                );
             })}
         </div>
       </div>
@@ -108,9 +137,13 @@ export default function SwipeTabs({ products }: { products: ProductCard[] }) {
         slidesPerView={1}
         spaceBetween={24}
       >
-        {tabs.map((tab) => (
+        {tabs.map((tab) => {
+          const products = tab.products.nodes;
+
+          return (
           <SwiperSlide key={tab.id} className="min-h-0">
             <div className="h-full min-h-0 overflow-y-auto overscroll-contain p-2">
+              {products.length > 0 ? (
                 <section className="columns-2 gap-4 md:columns-4">
                     {products.map((product: ProductCard) => {
                       const showComparePrice = shouldShowComparePrice(product.id);
@@ -142,9 +175,15 @@ export default function SwipeTabs({ products }: { products: ProductCard[] }) {
                       );
                     })}
                 </section>
+              ) : (
+                <p className="px-3 py-8 text-center text-sm text-gray-500">
+                  No products found in this collection.
+                </p>
+              )}
             </div>
           </SwiperSlide>
-        ))}
+          );
+        })}
       </Swiper>
     </div>
   );

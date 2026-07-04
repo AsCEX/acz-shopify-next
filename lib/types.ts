@@ -163,7 +163,12 @@ export type CollectionQuery = {
 
 export type CollectionsQuery = {
   collections: {
-    nodes: Array<Pick<Collection, 'id' | 'title' | 'handle' | 'description' | 'image'>>;
+    nodes: Array<
+      Pick<
+        Collection,
+        'id' | 'title' | 'handle' | 'description' | 'image' | 'products'
+      >
+    >;
   };
 };
 
