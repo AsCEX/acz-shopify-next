@@ -91,7 +91,7 @@ export default function SwipeTabs({
   };
 
   return (
-    <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-col">
+    <div className="mx-auto flex h-full min-h-0 w-full flex-col">
       {/* Synchronized menu */}
       <div className="sticky top-0 z-20 bg-white">
         <div

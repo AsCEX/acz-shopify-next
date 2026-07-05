@@ -13,7 +13,7 @@ export function Header() {
       <section className={'flex justify-center items-center text-white w-full h-[24px] bg-[var(--color-primary)] text-[11px]'}>
         Free Shipping for $10 above
       </section>
-      <header className={`flex gap-2 sticky top-0 z-40 border-b border-black/10 bg-white/95 backdrop-blur p-2 ${isHomePage ? " pl-4" : ""} md:static md:bg-white md:p-0`}>
+      <header className={`flex gap-2 sticky top-0 z-40 border-b border-black/10 bg-white/95 backdrop-blur p-2 ${isHomePage ? " pl-4" : ""} md:static md:bg-white`}>
           {!isHomePage && <button onClick={() => router.push("/")}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6" strokeWidth="2.5">
               <path fillRule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clipRule="evenodd" />
