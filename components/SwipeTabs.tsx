@@ -140,7 +140,7 @@ export default function SwipeTabs({
   return (
     <>
       <div className={clsx(
-        "absolute top-0 flex items-end w-full h-[240px] pt-[env(safe-area-inset-top)] transition-colors duration-300",
+        "absolute top-0 flex items-end w-full min-h-[240px] pt-[env(safe-area-inset-top)] transition-colors duration-300",
         bannerSlides.length === 0 && ' hidden'
         )}
         style={{backgroundColor: bannerBackgroundColor}}
