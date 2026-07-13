@@ -56,9 +56,9 @@ export default async function SalePage() {
                           </span>
                       )}
                       <span className="text-sm text-[var(--color-primary)] font-semibold" >
-                        {new Intl.NumberFormat('en-PH', {
+                        {new Intl.NumberFormat('en-US', {
                           style: 'currency',
-                          currency: 'USD',
+                          currency: product.priceRange.minVariantPrice.currencyCode,
                         }).format(Number(product.priceRange.minVariantPrice.amount))}
                       </span>
                   </div>

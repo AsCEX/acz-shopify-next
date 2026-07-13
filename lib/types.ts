@@ -167,7 +167,29 @@ export type CollectionsQuery = {
       Pick<
         Collection,
         'id' | 'title' | 'handle' | 'description' | 'image' | 'products'
-      >
+      > & {
+        collectionSlider: {
+          references: {
+            nodes: Array<{
+              id: string;
+              backgroundColor: {
+                value: string | null;
+              } | null;
+              textColor: {
+                value: string | null;
+              } | null;
+              activeTextColor: {
+                value: string | null;
+              } | null;
+              imageField: {
+                reference: {
+                  image: Image | null;
+                } | null;
+              } | null;
+            }>;
+          };
+        } | null;
+      }
     >;
   };
 };

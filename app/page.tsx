@@ -4,8 +4,6 @@ import {PRODUCTS_QUERY} from '@/lib/queries/products';
 import type {CollectionsQuery, ProductsQuery} from '@/lib/types';
 import SwipeTabs from '@/components/SwipeTabs';
 
-const EXCLUDED_COLLECTION_HANDLES = new Set(["frontpage", "hidden"]);
-
 export default async function HomePage() {
 
 
@@ -25,7 +23,10 @@ export default async function HomePage() {
 
   return (
     <>
-      <SwipeTabs collections={collectionsData.collections.nodes} allProducts={productsData.products.nodes} />
+      <SwipeTabs
+        collections={collectionsData.collections.nodes}
+        allProducts={productsData.products.nodes}
+      />
     </>
   );
 }

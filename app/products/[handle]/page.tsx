@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { addToCart } from "./actions";
 
 function formatMoney(money: Money) {
-  return new Intl.NumberFormat("en-PH", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: money.currencyCode,
   }).format(Number(money.amount));

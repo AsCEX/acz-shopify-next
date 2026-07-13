@@ -33,14 +33,14 @@ const benefits = [
 ];
 
 function formatMoney(money: { amount: string; currencyCode: string }) {
-  return new Intl.NumberFormat("en-PH", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: money.currencyCode,
   }).format(Number(money.amount));
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-PH", {
+  return new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
