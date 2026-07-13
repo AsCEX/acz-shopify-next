@@ -38,6 +38,14 @@ export const PRODUCT_CARD_FRAGMENT = `#graphql
         ...MoneyFragment
       }
     }
+    compareAtPriceRange {
+      minVariantPrice {
+        ...MoneyFragment
+      }
+      maxVariantPrice {
+        ...MoneyFragment
+      }
+    }
   }
 `;
 
@@ -89,6 +97,14 @@ export const PRODUCT_FRAGMENT = `#graphql
       }
     }
     priceRange {
+      minVariantPrice {
+        ...MoneyFragment
+      }
+      maxVariantPrice {
+        ...MoneyFragment
+      }
+    }
+    compareAtPriceRange {
       minVariantPrice {
         ...MoneyFragment
       }

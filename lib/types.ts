@@ -52,6 +52,10 @@ export type ProductCard = {
     minVariantPrice: Money;
     maxVariantPrice: Money;
   };
+  compareAtPriceRange: {
+    minVariantPrice: Money;
+    maxVariantPrice: Money;
+  };
 };
 
 export type Product = ProductCard & {

@@ -1,5 +1,5 @@
 "use client";
-import type {CollectionsQuery, ProductCard} from '@/lib/types';
+import type {CollectionsQuery, Money, ProductCard} from '@/lib/types';
 import Image from 'next/image';
 
 import {useEffect, useMemo, useRef, useState, useSyncExternalStore} from "react";
@@ -52,13 +52,11 @@ const fallbackTabs: CollectionTab[] = [
   },
 ];
 
-function shouldShowComparePrice(productId: string) {
-  const hash = Array.from(productId).reduce(
-    (total, char) => total + char.charCodeAt(0),
-    0,
-  );
-
-  return hash % 2 === 0;
+function formatMoney(money: Money) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: money.currencyCode,
+  }).format(Number(money.amount));
 }
 
 export default function SwipeTabs({
@@ -299,7 +297,10 @@ export default function SwipeTabs({
                 {allProducts.length > 0 ? (
                   <section className="columns-2 gap-4 md:columns-4 p-2 pb-26">
                       {allProducts.map((product: ProductCard) => {
-                        const showComparePrice = shouldShowComparePrice(product.id);
+                        const price = product.priceRange.minVariantPrice;
+                        const compareAtPrice = product.compareAtPriceRange.minVariantPrice;
+                        const showComparePrice =
+                          Number(compareAtPrice.amount) > Number(price.amount);
 
                         return (
                       <a key={product.id} href={`/products/${product.handle}`} className="mb-4 block break-inside-avoid bg-gray-100 rounded-md hover:shadow-md transition-shadow shadow">
@@ -314,15 +315,16 @@ export default function SwipeTabs({
                           ) : null}
                           <div className="p-2">
                               <h2 className={'truncate text-sm'}>{product.title}</h2>
+                              <div className="flex w-full gap-2 justify-start">
                               {showComparePrice && (
-                                  <span className="flex w-full text-sm text-red-500 font-semibold line-through">
-                                      {product.priceRange.maxVariantPrice.amount}{' '}
+                                  <span className="flex text-sm text-red-500 font-semibold line-through">
+                                      {formatMoney(compareAtPrice)}
                                   </span>
                               )}
                               <span className="text-sm text-[var(--color-primary)] font-semibold" >
-                              {product.priceRange.minVariantPrice.amount}{' '}
-                              {product.priceRange.minVariantPrice.currencyCode}
+                                {formatMoney(price)}
                               </span>
+                              </div>
                           </div>
                       </a>
                         );
@@ -405,7 +407,10 @@ export default function SwipeTabs({
                 {products.length > 0 ? (
                   <section className="columns-2 gap-4 md:columns-4 p-2 pb-26">
                       {products.map((product: ProductCard) => {
-                        const showComparePrice = shouldShowComparePrice(product.id);
+                        const price = product.priceRange.minVariantPrice;
+                        const compareAtPrice = product.compareAtPriceRange.minVariantPrice;
+                        const showComparePrice =
+                          Number(compareAtPrice.amount) > Number(price.amount);
 
                         return (
                       <a key={product.id} href={`/products/${product.handle}`} className="mb-4 block break-inside-avoid bg-gray-100 rounded-md hover:shadow-md transition-shadow shadow">
@@ -420,20 +425,16 @@ export default function SwipeTabs({
                           ) : null}
                           <div className="p-2">
                               <h2 className={'truncate text-sm'}>{product.title}</h2>
-                              {showComparePrice && (
-                                  <span className="flex w-full text-sm text-red-500 font-semibold line-through">
-                                      {new Intl.NumberFormat('en-US', {
-                                        style: 'currency',
-                                        currency: product.priceRange.maxVariantPrice.currencyCode,
-                                      }).format(Number(product.priceRange.maxVariantPrice.amount))}
-                                  </span>
-                              )}
-                              <span className="text-sm text-[var(--color-primary)] font-semibold" >
-                                {new Intl.NumberFormat('en-US', {
-                                  style: 'currency',
-                                  currency: product.priceRange.minVariantPrice.currencyCode,
-                                }).format(Number(product.priceRange.minVariantPrice.amount))}
-                              </span>
+                              <div className="flex w-full gap-2 justify-start">
+                                {showComparePrice && (
+                                    <span className="flex text-sm text-red-500 font-semibold line-through">
+                                        {formatMoney(compareAtPrice)}
+                                    </span>
+                                )}
+                                <span className="text-sm text-[var(--color-primary)] font-semibold" >
+                                  {formatMoney(price)}
+                                </span>
+                              </div>
                           </div>
                       </a>
                         );
