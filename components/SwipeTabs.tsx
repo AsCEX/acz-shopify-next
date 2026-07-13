@@ -140,12 +140,12 @@ export default function SwipeTabs({
   return (
     <>
       <div className={clsx(
-        "absolute top-0 flex items-end w-full h-[calc(240px+env(safe-area-inset-top,240px))] transition-colors duration-300",
+        "absolute top-0 flex items-end w-full h-[calc(250px+env(safe-area-inset-top,250px))] transition-colors duration-300",
         bannerSlides.length === 0 && ' hidden'
         )}
         style={{backgroundColor: bannerBackgroundColor}}
       >
-        <div className="slider h-[142px] w-full overflow-hidden bg-slate-900">
+        <div className="slider h-[144px] w-full overflow-hidden bg-slate-900">
           {bannerSlides.length > 0 ? (
             <Swiper
               key={`banner-${activeIndex}`}
@@ -170,9 +170,6 @@ export default function SwipeTabs({
                       className="object-cover"
                     />
                     <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                    <span className="absolute inset-x-4 bottom-6 truncate text-lg font-semibold text-white drop-shadow-sm">
-                      {slide.title}
-                    </span>
                   </>
                 );
 
@@ -264,7 +261,7 @@ export default function SwipeTabs({
         {/* Swipeable content */}
         <Swiper
           className={clsx(
-            "min-h-0 w-full flex-1",
+            "min-h-0 w-full flex-1 !pt-2",
             bannerSlides.length > 0 && " mt-[140px]"
           )}
           onSwiper={(swiper) => {
