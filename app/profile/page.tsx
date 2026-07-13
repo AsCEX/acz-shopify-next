@@ -1,4 +1,7 @@
-import { fetchCustomerProfile } from "@/lib/customer-account";
+import {
+  fetchCustomerProfile,
+  getCustomerAccessToken,
+} from "@/lib/customer-account";
 import type { CustomerProfile } from "@/lib/customer-account";
 import Link from "next/link";
 
@@ -91,7 +94,13 @@ function AuthStatus({ status }: { status?: string }) {
   return null;
 }
 
-function AccountPanel({ customer }: { customer: CustomerProfile | null }) {
+function AccountPanel({
+  customer,
+  isSignedIn,
+}: {
+  customer: CustomerProfile | null;
+  isSignedIn: boolean;
+}) {
   return (
     <section className="rounded-lg border border-black/10 bg-gray-50 p-5 md:sticky md:top-4 md:self-start">
       <div className="flex items-center gap-4">
@@ -103,16 +112,18 @@ function AccountPanel({ customer }: { customer: CustomerProfile | null }) {
             ACZ account
           </p>
           <h1 className="mt-1 text-2xl font-bold text-gray-950">
-            {customer ? customer.displayName : "Welcome back"}
+            {customer?.displayName || (isSignedIn ? "Your account" : "Welcome back")}
           </h1>
           <p className="mt-1 text-sm leading-5 text-gray-600">
             {customer?.emailAddress?.emailAddress ||
-              "Sign in to sync orders, addresses, and saved products."}
+              (isSignedIn
+                ? "Signed in. Your profile details are temporarily unavailable."
+                : "Sign in to sync orders, addresses, and saved products.")}
           </p>
         </div>
       </div>
 
-      {customer ? (
+      {isSignedIn ? (
         <div className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-1">
           <Link
             href="/api/auth/logout"
@@ -156,7 +167,13 @@ function AccountPanel({ customer }: { customer: CustomerProfile | null }) {
   );
 }
 
-function OrdersPanel({ customer }: { customer: CustomerProfile | null }) {
+function OrdersPanel({
+  customer,
+  isSignedIn,
+}: {
+  customer: CustomerProfile | null;
+  isSignedIn: boolean;
+}) {
   const orders = customer?.orders.nodes ?? [];
 
   return (
@@ -184,7 +201,7 @@ function OrdersPanel({ customer }: { customer: CustomerProfile | null }) {
         </div>
       ) : (
         <div className="mt-4 rounded-md bg-gray-50 p-4 text-sm leading-6 text-gray-600">
-          {customer
+          {isSignedIn
             ? "No orders yet. Your purchases will appear here after checkout."
             : "Sign in to view order history."}
         </div>
@@ -198,15 +215,17 @@ export default async function ProfilePage({
 }: {
   searchParams: Promise<{ auth?: string }>;
 }) {
-  const [{ auth }, customer] = await Promise.all([
+  const [{ auth }, customer, accessToken] = await Promise.all([
     searchParams,
     fetchCustomerProfile(),
+    getCustomerAccessToken(),
   ]);
+  const isSignedIn = Boolean(accessToken);
 
   return (
     <div className="h-full min-h-0 overflow-y-auto overscroll-contain bg-white pb-28">
       <main className="mx-auto grid w-full max-w-6xl gap-5 px-4 py-4 md:grid-cols-[minmax(0,0.9fr)_minmax(320px,1.1fr)] md:px-6 md:py-8 lg:px-8">
-        <AccountPanel customer={customer} />
+        <AccountPanel customer={customer} isSignedIn={isSignedIn} />
 
         <section className="min-w-0 space-y-5">
           <AuthStatus status={auth} />
@@ -241,7 +260,7 @@ export default async function ProfilePage({
             </div>
           </div>
 
-          <OrdersPanel customer={customer} />
+          <OrdersPanel customer={customer} isSignedIn={isSignedIn} />
 
           <div className="rounded-lg border border-black/10 bg-white p-4">
             <h2 className="text-base font-bold text-gray-950">Preferences</h2>

@@ -5,6 +5,9 @@
   --background: #ffffff;
   --foreground: #171717;
   --color-primary: #0f766e;
+
+  --header-height: 48px;
+  --announcement-height: 24px;
 }
 
 @theme inline {

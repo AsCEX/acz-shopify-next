@@ -2,7 +2,8 @@
 import type {CollectionsQuery, ProductCard} from '@/lib/types';
 import Image from 'next/image';
 
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState, useSyncExternalStore} from "react";
+import {createPortal} from "react-dom";
 import {Swiper, SwiperSlide} from "swiper/react";
 import type {Swiper as SwiperInstance} from "swiper";
 import {Autoplay, Pagination} from "swiper/modules";
@@ -12,6 +13,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 type CollectionTab = CollectionsQuery["collections"]["nodes"][number];
+
+const subscribeToClient = () => () => {};
 
 const fallbackTabs: CollectionTab[] = [
   {
@@ -70,13 +73,16 @@ export default function SwipeTabs({
   const tabButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
+  const isClient = useSyncExternalStore(
+    subscribeToClient,
+    () => true,
+    () => false,
+  );
 
   const tabs = useMemo(
     () => (collections.length > 0 ? collections : fallbackTabs),
     [collections],
   );
-
-  console.log(collections);
 
   const bannerSlides = useMemo(() => {
     const activeCollection = collections[activeIndex - 1];
@@ -112,7 +118,10 @@ export default function SwipeTabs({
     bannerSlides[activeBannerIndex]?.textColor ?? '#c1c1c1';
   const activeTextColor =
     bannerSlides[activeBannerIndex]?.activeTextColor ?? '#14b8a6';
-  
+
+  const headerOverlayTarget = isClient
+    ? document.getElementById('header-overlay-portal')
+    : null;
 
   useEffect(() => {
     const activeButton = tabButtonRefs.current[activeIndex];
@@ -139,66 +148,17 @@ export default function SwipeTabs({
 
   return (
     <>
-      <div className={clsx(
-        "absolute top-0 flex items-end w-full h-[calc(250px+env(safe-area-inset-top,250px))] transition-colors duration-300",
-        bannerSlides.length === 0 && ' hidden'
-        )}
-        style={{backgroundColor: bannerBackgroundColor}}
-      >
-        <div className="slider h-[144px] w-full overflow-hidden bg-slate-900">
-          {bannerSlides.length > 0 ? (
-            <Swiper
-              key={`banner-${activeIndex}`}
-              className="h-full w-full [&_.swiper-pagination-bullet]:!bg-white [&_.swiper-pagination-bullet-active]:!bg-white"
-              modules={[Autoplay, Pagination]}
-              autoplay={{delay: 4000, disableOnInteraction: false}}
-              pagination={{clickable: true}}
-              loop={bannerSlides.length > 1}
-              nested
-              onSlideChange={(swiper) => setActiveBannerIndex(swiper.realIndex)}
-              aria-label="Featured collections"
-            >
-              {bannerSlides.map((slide, index) => {
-                const content = (
-                  <>
-                    <Image
-                      src={slide.image.url}
-                      alt={slide.image.altText || slide.title}
-                      fill
-                      priority={index === 0}
-                      sizes="100vw"
-                      className="object-cover"
-                    />
-                    <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                  </>
-                );
-
-                return (
-                  <SwiperSlide
-                    key={slide.id}
-                    style={{backgroundColor: slide.backgroundColor}}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleMenuClick(slide.tabIndex)}
-                      className="relative block h-full w-full text-left"
-                      aria-label={`View ${slide.title} collection`}
-                    >
-                      {content}
-                    </button>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-          ) : (
-            <div className="flex h-full items-center justify-center text-sm text-white/70">
-              Featured products
-            </div>
-          )}
-        </div>
-      </div>
-      
+      {headerOverlayTarget && bannerSlides.length > 0
+        ? createPortal(
+            <div
+              className="h-full w-full transition-colors duration-300"
+              style={{backgroundColor: bannerBackgroundColor}}
+            />,
+            headerOverlayTarget,
+          )
+        : null}
       <div className="mx-auto flex h-full min-h-0 w-full flex-col">
+
         {/* Synchronized menu */}
         <div className="sticky top-0 z-20">
           <div
@@ -262,7 +222,7 @@ export default function SwipeTabs({
         <Swiper
           className={clsx(
             "min-h-0 w-full flex-1 !pt-2",
-            bannerSlides.length > 0 && " mt-[140px]"
+            bannerSlides.length > 0 && ""
           )}
           onSwiper={(swiper) => {
             swiperRef.current = swiper;
@@ -276,9 +236,68 @@ export default function SwipeTabs({
         >
 
             <SwiperSlide className="min-h-0">
-              <div className="h-full min-h-0 overflow-y-auto overscroll-contain p-2">
+              <div className="h-full min-h-0 overflow-y-auto overscroll-contain">
+
+              <div className={clsx(
+                "top-0 flex items-end w-full h-[160px] transition-colors duration-300",
+                bannerSlides.length === 0 && ' hidden'
+                )}
+                style={{backgroundColor: bannerBackgroundColor}}
+              >
+                <div className="slider h-[164px] w-full overflow-hidden bg-slate-900">
+                  {bannerSlides.length > 0 ? (
+                    <Swiper
+                      key={`banner-${activeIndex}`}
+                      className="h-full w-full [&_.swiper-pagination-bullet]:!bg-white [&_.swiper-pagination-bullet-active]:!bg-white"
+                      modules={[Autoplay, Pagination]}
+                      autoplay={{delay: 4000, disableOnInteraction: false}}
+                      pagination={{clickable: true}}
+                      loop={bannerSlides.length > 1}
+                      nested
+                      onSlideChange={(swiper) => setActiveBannerIndex(swiper.realIndex)}
+                      aria-label="Featured collections"
+                    >
+                      {bannerSlides.map((slide, index) => {
+                        const content = (
+                          <>
+                            <Image
+                              src={slide.image.url}
+                              alt={slide.image.altText || slide.title}
+                              fill
+                              priority={index === 0}
+                              sizes="100vw"
+                              className="object-cover"
+                            />
+                            <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                          </>
+                        );
+
+                        return (
+                          <SwiperSlide
+                            key={slide.id}
+                            style={{backgroundColor: slide.backgroundColor}}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => handleMenuClick(slide.tabIndex)}
+                              className="relative block h-full w-full text-left"
+                              aria-label={`View ${slide.title} collection`}
+                            >
+                              {content}
+                            </button>
+                          </SwiperSlide>
+                        );
+                      })}
+                    </Swiper>
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-sm text-white/70">
+                      Featured products
+                    </div>
+                  )}
+                </div>
+              </div>
                 {allProducts.length > 0 ? (
-                  <section className="columns-2 gap-4 md:columns-4 pb-26">
+                  <section className="columns-2 gap-4 md:columns-4 p-2 pb-26">
                       {allProducts.map((product: ProductCard) => {
                         const showComparePrice = shouldShowComparePrice(product.id);
 
@@ -322,9 +341,69 @@ export default function SwipeTabs({
 
             return (
             <SwiperSlide key={tab.id} className="min-h-0">
-              <div className="h-full min-h-0 overflow-y-auto overscroll-contain p-2">
+              <div className="h-full min-h-0 overflow-y-auto overscroll-contain">
+
+                <div className={clsx(
+                  "top-0 flex items-end w-full h-[calc(160px+env(safe-area-inset-top,160px))] transition-colors duration-300",
+                  bannerSlides.length === 0 && ' hidden'
+                  )}
+                  style={{backgroundColor: bannerBackgroundColor}}
+                >
+                  <div className="slider h-[164px] w-full overflow-hidden bg-slate-900">
+                    {bannerSlides.length > 0 ? (
+                      <Swiper
+                        key={`banner-${activeIndex}`}
+                        className="h-full w-full [&_.swiper-pagination-bullet]:!bg-white [&_.swiper-pagination-bullet-active]:!bg-white"
+                        modules={[Autoplay, Pagination]}
+                        autoplay={{delay: 4000, disableOnInteraction: false}}
+                        pagination={{clickable: true}}
+                        loop={bannerSlides.length > 1}
+                        nested
+                        onSlideChange={(swiper) => setActiveBannerIndex(swiper.realIndex)}
+                        aria-label="Featured collections"
+                      >
+                        {bannerSlides.map((slide, index) => {
+                          const content = (
+                            <>
+                              <Image
+                                src={slide.image.url}
+                                alt={slide.image.altText || slide.title}
+                                fill
+                                priority={index === 0}
+                                sizes="100vw"
+                                className="object-cover"
+                              />
+                              <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                            </>
+                          );
+
+                          return (
+                            <SwiperSlide
+                              key={slide.id}
+                              style={{backgroundColor: slide.backgroundColor}}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => handleMenuClick(slide.tabIndex)}
+                                className="relative block h-full w-full text-left"
+                                aria-label={`View ${slide.title} collection`}
+                              >
+                                {content}
+                              </button>
+                            </SwiperSlide>
+                          );
+                        })}
+                      </Swiper>
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-white/70">
+                        Featured products
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {products.length > 0 ? (
-                  <section className="columns-2 gap-4 md:columns-4 pb-26">
+                  <section className="columns-2 gap-4 md:columns-4 p-2 pb-26">
                       {products.map((product: ProductCard) => {
                         const showComparePrice = shouldShowComparePrice(product.id);
 
@@ -370,6 +449,7 @@ export default function SwipeTabs({
             );
           })}
         </Swiper>
+
       </div>
     </>
   );
