@@ -344,7 +344,7 @@ export default function SwipeTabs({
               <div className="h-full min-h-0 overflow-y-auto overscroll-contain">
 
                 <div className={clsx(
-                  "top-0 flex items-end w-full h-[calc(160px+env(safe-area-inset-top,160px))] transition-colors duration-300",
+                  "top-0 flex items-end w-full h-[160px] transition-colors duration-300",
                   bannerSlides.length === 0 && ' hidden'
                   )}
                   style={{backgroundColor: bannerBackgroundColor}}
