@@ -221,7 +221,7 @@ export default function SwipeTabs({
         {/* Swipeable content */}
         <Swiper
           className={clsx(
-            "min-h-0 w-full flex-1 !pt-2",
+            "min-h-0 w-full flex-1",
             bannerSlides.length > 0 && ""
           )}
           onSwiper={(swiper) => {

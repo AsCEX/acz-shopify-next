@@ -38,7 +38,8 @@ export function Header() {
       <div
         id="header-overlay-portal"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[calc(112px+env(safe-area-inset-top,112px))]"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[calc(104px+env(safe-area-inset-top,104px))]"
+        style={{backgroundColor: '#115c56'}}
       />
     </>
   );
